@@ -1,0 +1,96 @@
+name: Autograding Tests
+'on':
+  - push
+  - workflow_dispatch
+  - repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Integrity check - tests, pom.xml and grading.json must be unchanged
+        run: |
+          EXPECTED="27b395b23bb5b2a829c54bd702be898a3cc7839dc4072fb066cde1a3e0126680"
+          ACTUAL=$( (for f in $(find src/test/java -type f -name '*.java' | LC_ALL=C sort) pom.xml grading.json; do sed 's/\r$//' "$f"; done) | sha256sum | cut -d' ' -f1)
+          if [ "$ACTUAL" != "$EXPECTED" ]; then
+            echo "::error::The test files, pom.xml, or grading.json in this repository differ from the assignment template. Grading has been stopped. Restore the original files (git checkout origin/main -- src/test pom.xml grading.json) and push again."
+            exit 1
+          fi
+          echo "Integrity check passed."
+      - name: "average fixed (15)"
+        id: average
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: "average fixed"
+          setup-command: ''
+          command: mvn -B -q test -Dtest=AverageTest -Dsurefire.failIfNoSpecifiedTests=false
+          timeout: 5
+          max-score: 15
+      - name: "countVowels fixed (10)"
+        id: countvowels
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: "countVowels fixed"
+          setup-command: ''
+          command: mvn -B -q test -Dtest=CountVowelsTest -Dsurefire.failIfNoSpecifiedTests=false
+          timeout: 5
+          max-score: 10
+      - name: "isLeapYear fixed (20)"
+        id: isleapyear
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: "isLeapYear fixed"
+          setup-command: ''
+          command: mvn -B -q test -Dtest=IsLeapYearTest -Dsurefire.failIfNoSpecifiedTests=false
+          timeout: 5
+          max-score: 20
+      - name: "sumTo fixed (15)"
+        id: sumto
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: "sumTo fixed"
+          setup-command: ''
+          command: mvn -B -q test -Dtest=SumToTest -Dsurefire.failIfNoSpecifiedTests=false
+          timeout: 5
+          max-score: 15
+      - name: "sameWord fixed (15)"
+        id: sameword
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: "sameWord fixed"
+          setup-command: ''
+          command: mvn -B -q test -Dtest=SameWordTest -Dsurefire.failIfNoSpecifiedTests=false
+          timeout: 5
+          max-score: 15
+      - name: "maxOf fixed (25)"
+        id: maxof
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: "maxOf fixed"
+          setup-command: ''
+          command: mvn -B -q test -Dtest=MaxOfTest -Dsurefire.failIfNoSpecifiedTests=false
+          timeout: 5
+          max-score: 25
+      - name: Autograding Reporter
+        uses: classroom-resources/autograding-grading-reporter@v1
+        env:
+          AVERAGE_RESULTS: "${{ steps.average.outputs.result }}"
+          COUNTVOWELS_RESULTS: "${{ steps.countvowels.outputs.result }}"
+          ISLEAPYEAR_RESULTS: "${{ steps.isleapyear.outputs.result }}"
+          SUMTO_RESULTS: "${{ steps.sumto.outputs.result }}"
+          SAMEWORD_RESULTS: "${{ steps.sameword.outputs.result }}"
+          MAXOF_RESULTS: "${{ steps.maxof.outputs.result }}"
+        with:
+          runners: average,countvowels,isleapyear,sumto,sameword,maxof

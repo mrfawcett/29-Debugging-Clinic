@@ -1,0 +1,8 @@
+[
+ {"test": "AverageTest",     "name": "average fixed",     "points": 15},
+ {"test": "CountVowelsTest", "name": "countVowels fixed", "points": 10},
+ {"test": "IsLeapYearTest",  "name": "isLeapYear fixed",  "points": 20},
+ {"test": "SumToTest",       "name": "sumTo fixed",       "points": 15},
+ {"test": "SameWordTest",    "name": "sameWord fixed",    "points": 15},
+ {"test": "MaxOfTest",       "name": "maxOf fixed",       "points": 25}
+]
