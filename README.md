@@ -1,6 +1,6 @@
 # Debugging Clinic
 
-**Unit 1 — Programming Fundamentals & Debugging** · Pairs with lecture 1.5 Debugging Practices & Hand-Tracing (and the traps from 1.4)
+**Unit 1 — Programming Fundamentals & Debugging**
 
 This assignment is backwards. Nothing is blank. Every method in `Clinic.java`
 is already written, it all compiles, and **every method is wrong**. Six
